@@ -1,9 +1,4 @@
 # app/robo_advisor.py
-
-#load_dotenv()
-#SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "OOPS, please set env var called 'SENDGRID_API_KEY'")
-#MY_ADDRESS = os.environ.get("MY_EMAIL_ADDRESS", "OOPS, please set env var called 'MY_EMAIL_ADDRESS'")
-
 ### IMPORTS AND FORMATS
 
 import requests
@@ -11,16 +6,24 @@ import json
 import datetime
 import csv
 import os
-
+from dotenv import load_dotenv
 
 def to_usd(my_price):
     return "${0:,.2f}".format(my_price)
 
 ### INPUTS (get data)
 
+## Asking user for the stock
+
+load_dotenv() #loads contents of the .env file into the script's environment
+
 ## Requesting data as a string (json)
 
-request_url =  "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=MSFT&apikey=demo"
+api_key = os.environ.get("ALPHAVANTAGE_API_KEY") 
+
+symbol = "MSFT" # TODO: ASK USER FOR THIS
+
+request_url =  f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={api_key}"
 
 response = requests.get(request_url)
 
@@ -100,6 +103,7 @@ print("RECENT HIGH: " + to_usd(float(recent_high)))
 print("RECENT LOW: " + to_usd(float(recent_low)))
 print("-------------------------")
 
+
 ## Recommendation definition and printing
 
 print("RECOMMENDATION: BUY!")  #Logic defined by you
@@ -149,3 +153,5 @@ print("-------------------------")
 
 
 exit()
+
+
