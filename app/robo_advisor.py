@@ -9,6 +9,7 @@
 import requests
 import json
 import datetime
+import csv
 
 
 def to_usd(my_price):
@@ -55,9 +56,9 @@ latest_close = tsd[latest_day]["4. close"]
 
 high_prices = []
 
-for date_list in dates:
-    high_price = tsd[date_list]["2. high"]
-    high_prices.append(float(high_price))
+for date_list in dates: #for used to create a list
+    high_price = tsd[date_list]["2. high"] #then select which factor of the list you want
+    high_prices.append(float(high_price)) #finish defining a float of the list selected
 
 recent_high = max(high_prices)
 
@@ -71,36 +72,51 @@ for date_list in dates:
 
 recent_low = min(low_prices)
 
-# Print introduction (with symbol)
+# OUTPUTS
+
+## Print introduction (with symbol)
 
 print("-------------------------")
 print("SELECTED SYMBOL: MSFT")
 print("-------------------------")
 print("REQUESTING STOCK MARKET DATA...")
 
-# Print date and time
+## Print date and time
 now = datetime.datetime.now()
 print("REQUEST AT:" + now.strftime("%Y-%m-%d %I:%M %p"))
 print("-------------------------")
 
-# When date was refreshed
+## When date was refreshed
 print(f"LATEST DAY: {last_refreshed}") #formatted
 
 print("LATEST CLOSE: " + to_usd(float(latest_close)))
 
-
+## Highs and Lows printing
 
 print("RECENT HIGH: " + to_usd(float(recent_high)))
 print("RECENT LOW: " + to_usd(float(recent_low)))
 print("-------------------------")
-print("RECOMMENDATION: BUY!")
-print("RECOMMENDATION REASON: TODO")
+
+## Recommendation definition and printing
+
+print("RECOMMENDATION: BUY!")  #Logic defined by you
+print("RECOMMENDATION REASON: TODO") #Logic defined by you
+
+## Writing data into csv
+
+print("-------------------------")
+print("WRITING DATA INTO CSV FILE...")
+
+
+
+## Final message
+
 print("-------------------------")
 print("HAPPY INVESTING!")
 print("-------------------------")
 
 
-# OUTPUTS
+
 
 
 
