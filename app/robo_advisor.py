@@ -10,6 +10,7 @@ import requests
 import json
 import datetime
 import csv
+import os
 
 
 def to_usd(my_price):
@@ -76,8 +77,10 @@ recent_low = min(low_prices)
 
 ## Print introduction (with symbol)
 
+selected_symbol = "MSFT"
+
 print("-------------------------")
-print("SELECTED SYMBOL: MSFT")
+print("SELECTED SYMBOL: " + selected_symbol)
 print("-------------------------")
 print("REQUESTING STOCK MARKET DATA...")
 
@@ -104,9 +107,17 @@ print("RECOMMENDATION REASON: TODO") #Logic defined by you
 
 ## Writing data into csv
 
-print("-------------------------")
-print("WRITING DATA INTO CSV FILE...")
+file_name = "prices_" + selected_symbol + ".csv"
 
+save_path = os.path.join(os.path.dirname(__file__), "..", "data", file_name)
+
+with open(save_path, "w") as file_name:
+    print("teste")
+
+# Writing data
+
+print("-------------------------")
+print("WRITING DATA INTO CSV FILE: " + save_path)
 
 
 ## Final message
