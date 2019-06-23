@@ -3,29 +3,57 @@
 
 import requests
 import json
-import datetime
 import csv
+
+import datetime
+
 import os
+
 from dotenv import load_dotenv
+
+import matplotlib
+import matplotlib.pyplot as plt
+import matplotlib.ticker as tkr
+
+import numpy as np
 
 def to_usd(my_price):
     return "${0:,.2f}".format(my_price)
 
 ### INPUTS (get data)
 
-## Asking user for the stock
-
 load_dotenv() #loads contents of the .env file into the script's environment
+
+## Asking user for the stock (corrected if error)
+
+stock_symbol = input("Please input a stock symbol (Example MSFT): ")
+
 
 ## Requesting data as a string (json)
 
 api_key = os.environ.get("ALPHAVANTAGE_API_KEY") 
 
-symbol = "MSFT" # TODO: ASK USER FOR THIS
+symbol = stock_symbol 
 
 request_url =  f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={api_key}"
 
 response = requests.get(request_url)
+
+## Defining CSV file
+
+file_name = "prices_" + stock_symbol + ".csv"
+
+save_path = os.path.join(os.path.dirname(__file__), "..", "data", file_name)
+
+## Correcting if does not exist
+
+while not os.path.exists(save_path): #correct if does not exist
+    print("---------------------------------------------------------------------")
+    print("\n")
+    print("The stock selected do not exist. Please try again")
+    print("\n")
+    print("---------------------------------------------------------------------")
+    exit()
 
 ## Transforming the string into dictionary
 
@@ -80,7 +108,7 @@ recent_low = min(low_prices)
 
 ## Print introduction (with symbol)
 
-selected_symbol = "MSFT"
+selected_symbol = stock_symbol
 
 print("-------------------------")
 print("SELECTED SYMBOL: " + selected_symbol)
@@ -106,6 +134,12 @@ print("-------------------------")
 
 ## Recommendation definition and printing
 
+# One simple example algorithm would be (in pseudocode): 
+# If the stock's latest closing price is less than 20% 
+# above its recent low, "Buy", else "Don't Buy".
+
+
+
 print("RECOMMENDATION: BUY!")  #Logic defined by you
 print("RECOMMENDATION REASON: TODO") #Logic defined by you
 
@@ -113,16 +147,10 @@ print("RECOMMENDATION REASON: TODO") #Logic defined by you
 
 # Writing data
 
-file_name = "prices_" + selected_symbol + ".csv"
-
-save_path = os.path.join(os.path.dirname(__file__), "..", "data", file_name)
-
 csv_headers = ["timestamp", "open", "high", "low", "close", "volume"]
 
 print("-------------------------")
 print("WRITING DATA INTO CSV FILE: " + save_path)
-
-# Creating the data
 
 with open(save_path, "w") as csv_file:
     writer = csv.DictWriter(csv_file, fieldnames=csv_headers, lineterminator = '\n')
@@ -141,7 +169,42 @@ with open(save_path, "w") as csv_file:
             "volume": daily_prices["5. volume"]})
 
 
-## Final message
+
+# PLOTTING CHART
+
+# first two lines are the list comprehensions to make a list of dictionaries into a list)
+
+close_prices = []
+for date_list in dates:
+    close_price = tsd[date_list]["4. close"]
+    close_prices.append(float(close_price))
+
+y = close_prices 
+x = dates 
+
+#sorting in the correct order
+
+x.reverse()
+y.reverse()
+
+# break charts into two
+
+fig, ax = plt.subplots() # enables us to further customize the figure and/or the axes
+
+# CHART GENERATION
+
+plt.plot(x, y) 
+
+plt.title("HISTORICAL CLOSING PRICES " + "(" + stock_symbol + ")") # AXIS TITLES
+plt.ylabel('Price in USD') # AXIS TITLES     
+plt.xlabel("Dates") # AXIS TITLES
+#editing number of ticks in the axis (https://stackoverflow.com/questions/6682784/reducing-number-of-plot-ticks/6682846#6682846)
+ax.xaxis.set_major_locator(plt.MaxNLocator(4))
+    
+plt.tight_layout() # ensures all areas of the chart are visible by default (fixes labels getting cut off)
+plt.show()
+
+# Final message
 
 print("-------------------------")
 print("HAPPY INVESTING!")
@@ -155,3 +218,7 @@ print("-------------------------")
 exit()
 
 
+#formatting chart
+
+#usd_formatter = tkr.FormatStrFormatter('$%1.0f')
+#ax.xaxis.set_major_formatter(usd_formatter)
