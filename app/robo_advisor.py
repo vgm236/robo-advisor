@@ -4,9 +4,14 @@
 #SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "OOPS, please set env var called 'SENDGRID_API_KEY'")
 #MY_ADDRESS = os.environ.get("MY_EMAIL_ADDRESS", "OOPS, please set env var called 'MY_EMAIL_ADDRESS'")
 
+### IMPORTS AND FORMATS
+
 import requests
 import json
+import datetime
 
+def to_usd(my_price):
+    return "${0:,.2f}".format(my_price)
 
 ### INPUTS (get data)
 
@@ -32,16 +37,40 @@ output_size =  parsed_response["Meta Data"]["4. Output Size"]
 
 time =  parsed_response["Meta Data"]["5. Time Zone"]
 
+# Defining "Time Series" variables
 
+tsd = parsed_response["Time Series (Daily)"]
+
+
+# Days selection
+
+date_keys = tsd.keys() #transforming days into list - step 1
+dates = list(date_keys) #transforming days into list - step 2 (this is weird, but that's how Python works)
+
+latest_day =  dates[0] # select the last day
+
+latest_close = tsd[latest_day]["4. close"]
+
+
+# Print introduction (with symbol)
 
 print("-------------------------")
 print("SELECTED SYMBOL: MSFT")
 print("-------------------------")
 print("REQUESTING STOCK MARKET DATA...")
-print("REQUEST AT: 2018-02-20 02:00pm")
+
+# Print date and time
+now = datetime.datetime.now()
+print("REQUEST AT:" + now.strftime("%Y-%m-%d %I:%M %p"))
 print("-------------------------")
+
+# When date was refreshed
 print(f"LATEST DAY: {last_refreshed}") #formatted
-print("LATEST CLOSE: $100,000.00")
+
+print("LATEST CLOSE: " + to_usd(float(latest_close)))
+
+
+
 print("RECENT HIGH: $101,000.00")
 print("RECENT LOW: $99,000.00")
 print("-------------------------")
