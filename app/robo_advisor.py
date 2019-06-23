@@ -107,17 +107,34 @@ print("RECOMMENDATION REASON: TODO") #Logic defined by you
 
 ## Writing data into csv
 
+# Writing data
+
 file_name = "prices_" + selected_symbol + ".csv"
 
 save_path = os.path.join(os.path.dirname(__file__), "..", "data", file_name)
 
-with open(save_path, "w") as file_name:
-    print("teste")
-
-# Writing data
+csv_headers = ["timestamp", "open", "high", "low", "close", "volume"]
 
 print("-------------------------")
 print("WRITING DATA INTO CSV FILE: " + save_path)
+
+# Creating the data
+
+with open(save_path, "w") as csv_file:
+    writer = csv.DictWriter(csv_file, fieldnames=csv_headers, lineterminator = '\n')
+    writer.writeheader() #uses fieldname set above
+    
+    #adding dates
+    for date in dates:
+        daily_prices = tsd[date]  
+    #assembling a dictionary
+        writer.writerow({
+            "timestamp": date,
+            "open": daily_prices["1. open"],
+            "high": daily_prices["2. high"],
+            "low": daily_prices["3. low"],
+            "close": daily_prices["4. close"],
+            "volume": daily_prices["5. volume"]})
 
 
 ## Final message
