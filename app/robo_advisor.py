@@ -17,6 +17,8 @@ import matplotlib.ticker as tkr
 
 import numpy as np
 
+import pandas as pd
+
 def to_usd(my_price):
     return "${0:,.2f}".format(my_price)
 
@@ -45,23 +47,24 @@ file_name = "prices_" + stock_symbol + ".csv"
 
 save_path = os.path.join(os.path.dirname(__file__), "..", "data", file_name)
 
-## Correcting if does not exist
-
-while not os.path.exists(save_path): #correct if does not exist
-    print("---------------------------------------------------------------------")
-    print("\n")
-    print("The stock selected do not exist. Please try again")
-    print("\n")
-    print("---------------------------------------------------------------------")
-    exit()
-
 ## Transforming the string into dictionary
+
 
 parsed_response = json.loads(response.text)
 
+## Correcting if does not exist
 ## Defining "Meta Data" variables
 
-description =  parsed_response["Meta Data"]["1. Information"]
+try:
+    description =  parsed_response["Meta Data"]["1. Information"]
+except:
+    print("-------------------------")
+    print("\n")
+    print('Incorrect stock symbol. Please try again')
+    print("\n")
+    print("-------------------------")
+    exit()
+
 
 ticker =  parsed_response["Meta Data"]["2. Symbol"]
 
@@ -131,6 +134,36 @@ print("RECENT HIGH: " + to_usd(float(recent_high)))
 print("RECENT LOW: " + to_usd(float(recent_low)))
 print("-------------------------")
 
+## 30-days average (closing, highs and lows)
+
+window_average = 30
+
+close_prices = []
+
+for date_list in dates:
+    close_price = tsd[date_list]["4. close"]
+    close_prices.append(float(close_price))
+
+#close_prices
+
+close_prices_pand = pd.Series(close_prices)
+average_close_prices = (close_prices_pand.rolling(window=window_average).mean())
+
+most_recent_close = average_close_prices[window_average-1]
+
+#high_prices
+
+high_prices_pand = pd.Series(high_prices)
+average_high_prices = (high_prices_pand.rolling(window=window_average).mean())
+
+most_recent_high = average_high_prices[window_average-1]
+
+#low_prices
+
+low_prices_pand = pd.Series(low_prices)
+average_low_prices = (low_prices_pand.rolling(window=window_average).mean())
+
+most_recent_low = average_low_prices[window_average-1]
 
 ## Recommendation definition and printing
 
@@ -138,10 +171,20 @@ print("-------------------------")
 # If the stock's latest closing price is less than 20% 
 # above its recent low, "Buy", else "Don't Buy".
 
-
-
-print("RECOMMENDATION: BUY!")  #Logic defined by you
-print("RECOMMENDATION REASON: TODO") #Logic defined by you
+if close_prices[0] > most_recent_close:
+    print("\n")
+    print("RECOMMENDATION: BUY!") 
+    print("-------------------------") #Logic defined by you
+    print("\n")
+    print("RECOMMENDATION REASON: Current price is higher than the last 30 days") #Logic defined by you
+    print("\n")
+    print("-------------------------")
+else:
+    print("-------------------------")
+    print("\n")
+    print("RECOMMENDATION: DON'T BUY!")
+    print("\n")
+    print("-------------------------")
 
 ## Writing data into csv
 
@@ -171,13 +214,6 @@ with open(save_path, "w") as csv_file:
 
 
 # PLOTTING CHART
-
-# first two lines are the list comprehensions to make a list of dictionaries into a list)
-
-close_prices = []
-for date_list in dates:
-    close_price = tsd[date_list]["4. close"]
-    close_prices.append(float(close_price))
 
 y = close_prices 
 x = dates 
@@ -216,9 +252,3 @@ print("-------------------------")
 
 
 exit()
-
-
-#formatting chart
-
-#usd_formatter = tkr.FormatStrFormatter('$%1.0f')
-#ax.xaxis.set_major_formatter(usd_formatter)
