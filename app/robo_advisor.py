@@ -174,6 +174,7 @@ most_recent_low = average_low_prices[window_average-1]
 if close_prices[0] > most_recent_close:
     print("\n")
     print("RECOMMENDATION: BUY!") 
+    print("\n")
     print("-------------------------") #Logic defined by you
     print("\n")
     print("RECOMMENDATION REASON: Current price is higher than the last 30 days") #Logic defined by you
@@ -192,7 +193,6 @@ else:
 
 csv_headers = ["timestamp", "open", "high", "low", "close", "volume"]
 
-print("-------------------------")
 print("WRITING DATA INTO CSV FILE: " + save_path)
 
 with open(save_path, "w") as csv_file:
@@ -245,9 +245,6 @@ plt.show()
 print("-------------------------")
 print("HAPPY INVESTING!")
 print("-------------------------")
-
-
-
 
 
 
